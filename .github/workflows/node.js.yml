@@ -1,18 +1,24 @@
 name: Deploy Code to EC2
- 
+
 on:
   push:
     branches:
       - master
- 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
     - name: 🛎️ Checkout Code
       uses: actions/checkout@v3
- 
+
+    - name: 📁 Create Folder and Files
+      run: |
+        mkdir -p hrithik
+        echo "This is file1" > hrithik/file1
+        echo "This is file2" > hrithik/file2
+
     - name: 🚀 Deploy Code to EC2
       uses: appleboy/scp-action@master
       with:
@@ -22,7 +28,7 @@ jobs:
         source: .
         target: "/home/ubuntu"
         debug: true
- 
+
     - name: ✅ Verify Deployment
       uses: appleboy/ssh-action@master
       with:
@@ -31,8 +37,9 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         script: |
           ls -la /home/ubuntu
+          ls -la /home/ubuntu/hrithik
           cd /home/ubuntu
           sudo npm install
-          sudo pm2 delete server
+          sudo pm2 delete server || true
           sudo pm2 start server.js
           sudo pm2 list
