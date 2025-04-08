@@ -1,4 +1,4 @@
-name: Deploy Code to EC2
+name: 🚀 Deploy Code to EC2
 
 on:
   push:
@@ -7,39 +7,44 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to EC2 Instance
     runs-on: ubuntu-latest
 
     steps:
-    - name: 🛎️ Checkout Code
-      uses: actions/checkout@v3
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: 📁 Create Folder and Files
-      run: |
-        mkdir -p hrithik
-        echo "This is file1" > hrithik/file1
-        echo "This is file2" > hrithik/file2
+      - name: 📁 Create Sample Folder and Files
+        run: |
+          mkdir -p hrithik
+          echo "This is file1" > hrithik/file1
+          echo "This is file2" > hrithik/file2
 
-    - name: 🚀 Deploy Code to EC2
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        source: .
-        target: "/home/ubuntu"
-        debug: true
+      - name: 📤 Copy Files to EC2 Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "/home/ubuntu/hrithik"
+          strip_components: 1
+          overwrite: true
+          debug: true
 
-    - name: ✅ Verify Deployment
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        script: |
-          ls -la /home/ubuntu
-          ls -la /home/ubuntu/hrithik
-          cd /home/ubuntu
-          sudo npm install
-          sudo pm2 delete server || true
-          sudo pm2 start server.js
-          sudo pm2 list
+      - name: ✅ Run Post-Deployment Commands on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/hrithik
+            ls -la
+            # If this is a real project, adjust path and commands accordingly
+            cd /home/ubuntu/hrithik
+            npm install
+            pm2 delete server || true
+            pm2 start server.js
+            pm2 save
+            pm2 list
