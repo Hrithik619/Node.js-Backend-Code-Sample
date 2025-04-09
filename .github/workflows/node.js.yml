@@ -33,6 +33,6 @@ jobs:
           ls -la /home/ubuntu/pm2-testing/sample-node-project
           cd /home/ubuntu/pm2-testing/sample-node-project
           sudo npm install
-          sudo pm2 delete nodejs
-          sudo pm2 start server.js --name nodejs
+          sudo pm2 delete testing
+          sudo pm2 start npm --name "testing" -- start
           sudo pm2 list
