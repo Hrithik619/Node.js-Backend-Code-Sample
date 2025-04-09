@@ -14,15 +14,20 @@ jobs:
       - name: 🛎️ Checkout Repository
         uses: actions/checkout@v3
 
+      - name: 📁 Create Sample Folder and Files
+        run: |
+          mkdir -p hrithik
+          echo "This is file1" > hrithik/file1
+          echo "This is file2" > hrithik/file2
       - name: 📤 Copy Files to EC2 Server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "."  # Sends entire repo
-          target: "/home/ubuntu/nodejs/Node.js-Backend-Code-Sample"
-          strip_components: 0
+          source: "."
+          target: "/home/ubuntu/hrithik"
+          strip_components: 1
           overwrite: true
           debug: true
 
@@ -33,7 +38,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd /home/ubuntu/nodejs/Node.js-Backend-Code-Sample
+            cd /home/ubuntu/hrithik
+            ls -la
+            # If this is a real project, adjust path and commands accordingly
+            cd /home/ubuntu/hrithik
             npm install
             pm2 delete server || true
             pm2 start server.js
